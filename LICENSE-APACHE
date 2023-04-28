@@ -201,8 +201,7 @@ file format. We also recommend that a file or class name and description of
 purpose be included on the same "printed page" as the copyright notice for easier
 identification within third-party archives.
 
-Copyright [yyyy] Kristian
-Freeman
+Copyright 2023 Cloudflare
 
 Licensed under the Apache License, Version 2.0 (the "License");
 
