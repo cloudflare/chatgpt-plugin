@@ -1,0 +1,19 @@
+{
+  "name": "cloudflare-docs-retrieval-plugin",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "cd plugin && wrangler dev --local",
+    "deploy": "cd plugin && wrangler publish",
+    "dev:scheduler": "cd scheduler && wrangler dev --local",
+    "deploy:scheduler": "cd scheduler && wrangler publish",
+    "refresh": "cd scripts && ./refresh.sh",
+    "schema": "cd plugin/src/manifests && npx openapi-typescript openapi.json > openapi.d.ts"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20230419.0",
+    "@types/node": "^18.16.4",
+    "wrangler": "^2.19.0"
+  }
+}

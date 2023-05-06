@@ -1,0 +1,18 @@
+{
+  "schema_version": "v1",
+  "name_for_model": "cloudflare_docs_retrieval",
+  "name_for_human": "Cloudflare Docs",
+  "description_for_model": "Plugin for searching through Cloudflare's documentation to find answers to questions and retrieve relevant information. Use it whenever a user asks something that might be related to Cloudflare.",
+  "description_for_human": "Search through Cloudflare's documentation.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://<this-whole-url-is-replaced-dynamically>/.well-known/openapi.json",
+    "has_user_authentication": false
+  },
+  "logo_url": "https://developers.cloudflare.com/assets/icon-256x256-870aa2b4.png",
+  "contact_email": "mhart@cloudflare.com",
+  "legal_info_url": "https://www.cloudflare.com/website-terms/"
+}

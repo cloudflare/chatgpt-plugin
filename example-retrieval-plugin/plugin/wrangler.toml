@@ -1,0 +1,9 @@
+name = "retrieval"
+main = "src/index.js"
+compatibility_date = "2023-04-07"
+usage_model = "bundled"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "d03..."
+preview_id = "6ab..."
