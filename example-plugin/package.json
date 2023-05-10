@@ -11,6 +11,6 @@
     "deploy": "wrangler publish"
   },
   "dependencies": {
-    "@cloudflare/itty-router-openapi": "file:vendor/dist-01.2.tgz"
+    "@cloudflare/itty-router-openapi": "file:vendor/dist-0.1.2.tgz"
   }
 }
