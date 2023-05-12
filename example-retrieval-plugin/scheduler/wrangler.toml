@@ -1,0 +1,29 @@
+name = "scheduled-retrieval"
+main = "src/index.js"
+compatibility_date = "2023-04-07"
+usage_model = "unbound"
+
+[triggers]
+crons = [ "1 * * * *" ]
+
+[[kv_namespaces]]
+binding = "KV"
+id = "d03..."
+preview_id = "6ab..."
+
+[[durable_objects.bindings]]
+name = "JOB_STORE"
+class_name = "JobStore"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["JobStore"]
+
+[[queues.producers]]
+binding = "RESOLVER_QUEUE"
+queue = "embeddings-resolver"
+
+[[queues.consumers]]
+queue = "embeddings-resolver"
+max_batch_size = 100
+max_batch_timeout = 30

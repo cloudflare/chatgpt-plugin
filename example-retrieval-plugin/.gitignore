@@ -1,0 +1,6 @@
+node_modules/
+.mf/
+.dev.vars
+scripts/*.bulk.json
+scripts/*.ndjson
+scripts/*.bin
