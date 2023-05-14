@@ -1,6 +1,10 @@
 const ID_BYTES = 8; // 64 bits
 const HEADER_BYTE_LENGTH = 2 * Uint16Array.BYTES_PER_ELEMENT;
 
+// OpenAI embeddings are [-1, 1), so we can
+// quantize to Int16 by multiplying by 2^15
+const QUANTIZE_MAX = Math.pow(2, 15);
+
 export class VectorCollection {
   static VERSION = 1;
 
@@ -8,7 +12,7 @@ export class VectorCollection {
    * @param {ArrayBuffer | number | null} [buffer]
    * @param {Uint16Array | number} [header]
    * @param {Uint8Array} [ids]
-   * @param {Float32Array} [embeddings]
+   * @param {Int16Array} [embeddings]
    */
   constructor(buffer, header, ids, embeddings) {
     if (typeof buffer === "number" || typeof header === "number") {
@@ -16,7 +20,7 @@ export class VectorCollection {
       const embeddingLength = Number(header);
       buffer = new ArrayBuffer(
         HEADER_BYTE_LENGTH +
-          length * (ID_BYTES + embeddingLength * Float32Array.BYTES_PER_ELEMENT)
+          length * (ID_BYTES + embeddingLength * Int16Array.BYTES_PER_ELEMENT)
       );
       header = new Uint16Array(buffer, 0, 2);
       header[0] = VectorCollection.VERSION;
@@ -36,15 +40,14 @@ export class VectorCollection {
       new Uint8Array(this.buffer, HEADER_BYTE_LENGTH, this.length * ID_BYTES);
     this.embeddings =
       embeddings ??
-      new Float32Array(
-        this.buffer,
-        HEADER_BYTE_LENGTH + this.length * ID_BYTES
-      );
+      new Int16Array(this.buffer, HEADER_BYTE_LENGTH + this.length * ID_BYTES);
     this.embeddingLength = this.embeddings.length / this.length;
   }
 
   /**
-   * @param {{id: string, embedding: Vector}[]} embeddingsWithIds
+   * NB: This assumes `embedding` is an array of floats in the range [-1, 1)
+   *
+   * @param {{id: string, embedding: number[]}[]} embeddingsWithIds
    * @returns {VectorCollection}
    */
   static from(embeddingsWithIds) {
@@ -56,8 +59,11 @@ export class VectorCollection {
     for (let i = 0; i < embeddingsWithIds.length; i++) {
       const { id, embedding } = embeddingsWithIds[i];
       const idBytes = (id.match(/../g) ?? []).map((b) => parseInt(b, 16));
+      const quantizedEmbedding = embedding.map((x) =>
+        Math.min(Math.round(x * QUANTIZE_MAX), QUANTIZE_MAX - 1)
+      );
       collection.ids.set(idBytes, i * ID_BYTES);
-      collection.embeddings.set(embedding, i * embeddingLength);
+      collection.embeddings.set(quantizedEmbedding, i * embeddingLength);
     }
 
     return collection;
@@ -120,8 +126,15 @@ export class VectorCollection {
   }
 
   /** @param {number} ix */
+  idStrAt(ix) {
+    return [...this.idAt(ix)]
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  /** @param {number} ix */
   vectorAt(ix) {
-    return new Float32Array(
+    return new Int16Array(
       this.embeddings.buffer,
       this.embeddings.byteOffset +
         ix * this.embeddingLength * this.embeddings.BYTES_PER_ELEMENT,
@@ -130,30 +143,35 @@ export class VectorCollection {
   }
 
   *idStrs() {
-    for (let i = 0; i < this.length; i++) {
-      yield [...this.idAt(i)]
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
+    for (let ix = 0; ix < this.length; ix++) {
+      yield this.idStrAt(ix);
     }
   }
 
   /**
+   * NB: This assumes `query` is an array of floats in the range [-1, 1)
    *
-   * @param {Vector} query
+   * @param {number[]} query
    * @param {number} numK
    */
   topK(query, numK) {
-    const similarities = [...this.idStrs()].map((id, ix) => ({
-      id,
-      similarity: cosineSimilarity(
-        query,
-        this.embeddings,
-        ix * this.embeddingLength
-      ),
-    }));
-    return similarities
-      .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, numK);
+    const { embeddings, embeddingLength } = this;
+    query = query.map((x) => x * QUANTIZE_MAX);
+
+    // Minor optimization, we use euclidian distance to compare,
+    // and then only calculate cosine similarity on the top K.
+    // For millions of vectors, a max-heap would work better here,
+    // rather that allocating and sorting the entire array.
+    return Array.from({ length: this.length }, (_, ix) => ({
+      ix,
+      distance: sqeuclidian(query, embeddings, ix * embeddingLength),
+    }))
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, numK)
+      .map(({ ix }) => ({
+        id: this.idStrAt(ix),
+        similarity: cosine(query, embeddings, ix * embeddingLength),
+      }));
   }
 }
 
@@ -162,7 +180,21 @@ export class VectorCollection {
  * @param {Vector} v2
  * @param {number} [v2StartIx]
  */
-export function cosineSimilarity(v1, v2, v2StartIx = 0) {
+function sqeuclidian(v1, v2, v2StartIx = 0) {
+  let sum = 0;
+  for (let i = 0; i < v1.length; i++) {
+    const diff = v1[i] - v2[v2StartIx + i];
+    sum += diff * diff;
+  }
+  return sum;
+}
+
+/**
+ * @param {Vector} v1
+ * @param {Vector} v2
+ * @param {number} [v2StartIx]
+ */
+function cosine(v1, v2, v2StartIx = 0) {
   let dotproduct = 0;
   let mA = 0;
   let mB = 0;
