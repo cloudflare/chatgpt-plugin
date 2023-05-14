@@ -25,8 +25,8 @@ async function main() {
 
   const vectorCollection = VectorCollection.from(chunkEmbeddings);
 
-  console.error("Number of embeddings:", vectorCollection.length);
-  console.error("Embedding length:", vectorCollection.embeddingLength);
+  console.warn("Number of embeddings:", vectorCollection.length);
+  console.warn("Embedding length:", vectorCollection.embeddingLength);
 
   writeFileSync("embeddings.bin", new Uint8Array(vectorCollection.buffer));
 }

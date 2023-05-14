@@ -2,9 +2,10 @@ name = "scheduled-retrieval"
 main = "src/index.js"
 compatibility_date = "2023-04-07"
 usage_model = "unbound"
+workers_dev = false
 
 [triggers]
-crons = [ "1 * * * *" ]
+crons = [ "1 * * * *" ] # Every hour at 1 minute past
 
 [[kv_namespaces]]
 binding = "KV"

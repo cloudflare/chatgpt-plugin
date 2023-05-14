@@ -35,8 +35,8 @@ const chunks = filesWithContents
   .map(({ path, oid, text }) => textToChunks(path, oid, text))
   .flat();
 
-console.error("Number of files: ", filesWithContents.length);
-console.error("Number of chunks: ", chunks.length);
+console.warn("Number of files: ", filesWithContents.length);
+console.warn("Number of chunks: ", chunks.length);
 
 writeFileSync(
   "chunks.bulk.json",

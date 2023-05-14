@@ -37,7 +37,7 @@ export function textToChunks(filePath, fileId, markdownText) {
   let title = (markdownText.match(/^title: (.+)$/m) ?? [])[1];
 
   if (title == null) {
-    console.error("No title:", filePath);
+    console.warn("No title:", filePath);
     return [];
   }
 
@@ -52,7 +52,7 @@ export function textToChunks(filePath, fileId, markdownText) {
     .trim();
 
   if (markdownText.length < 100) {
-    console.error("Too short:", filePath);
+    console.warn("Too short:", filePath);
     return [];
   }
 
