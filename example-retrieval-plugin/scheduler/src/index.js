@@ -14,6 +14,12 @@ const EMBEDDINGS_KEY = "embeddings:v1";
 /** @type {ExportedHandler<Env, EmbeddingMessage>} */
 export default {
   async scheduled(controller, env, ctx) {
+    if (!env.GITHUB_API_KEY) {
+      throw new Error("GITHUB_API_KEY is not set");
+    }
+    if (!env.OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is not set");
+    }
     ctx.waitUntil(scheduleEmbeddings(env, ctx));
     console.log("scheduled ok");
   },

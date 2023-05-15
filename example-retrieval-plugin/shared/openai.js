@@ -3,7 +3,7 @@ const OPENAI_BASE = "https://api.openai.com/v1";
 /**
  * @param {string[]} chunks
  * @param {string} apiKey
- * @returns {Promise<{data: {embedding: number[]}[], error?: string}>}
+ * @returns {Promise<{data: {embedding: number[]}[], error?: {message: string, type: string}}>}
  */
 export async function fetchEmbeddings(chunks, apiKey) {
   const NUM_RETRIES = 100;
