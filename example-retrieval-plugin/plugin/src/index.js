@@ -65,6 +65,10 @@ async function retrievalPluginQuery(request, env, ctx) {
   /** @type {QueryRequest} */
   const { queries } = await request.json();
 
+  if (queries == null || !Array.isArray(queries)) {
+    throw new Error("unexpected json payload");
+  }
+
   let topKs = await Promise.all(
     queries.map(({ query, top_k: topK }) => queryVectorStore(env, query, topK))
   );
@@ -101,9 +105,17 @@ const CHUNK_TTL = 24 * 60 * 60; // 24 hours
  * @returns {Promise<(Chunk & {similarity: number})[]>}
  */
 async function queryVectorStore(env, query, topK = 3) {
+  if (!query) {
+    throw new Error("query is empty");
+  }
+  if (!env.OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY is not set");
+  }
   const res = await fetchEmbeddings([query], env.OPENAI_API_KEY);
   if (res.error != null) {
-    throw new Error(res.error);
+    const err = new Error(res.error.message || String(res.error));
+    err.cause = res.error;
+    throw err;
   }
   const queryEmbedding = res.data[0].embedding;
 
