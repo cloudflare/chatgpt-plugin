@@ -23,3 +23,8 @@ The sample plugin allows ChatGPT users to search for repositories using GitHub's
 ## Deploying to OpenAI's API
 
 Follow the instructions [in the ChatGPT documentation](https://platform.openai.com/docs/plugins/introduction/plugin-flow) to deploy your plugin and begin using it in ChatGPT.
+
+
+## Extended example by @cagataycali
+
+In this version of ChatGPT plugin template, we're experimenting Cloudflare AI solution on workers.
