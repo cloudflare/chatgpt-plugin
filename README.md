@@ -5,7 +5,7 @@ This repo contains Cloudflare's work with ChatGPT plugins. The plugins are built
 - [`example-plugin`](https://github.com/cloudflare/chatgpt-plugin/tree/main/example-plugin): An example plugin that can be deployed to Cloudflare Workers in 5 minutes, allowing search and retrieval of GitHub repositories.
 - [`example-weather-plugin`](https://github.com/cloudflare/chatgpt-plugin/tree/main/example-weather-plugin): An example plugin that retrieves weather information from the [Pirate Weather API](https://pirate-weather.apiable.io/).
 
-## Extended example by @cagataycali
+## Extended with AI example
 
 In this version of ChatGPT plugin template, we're experimenting Cloudflare AI solution on workers.
 
@@ -31,6 +31,8 @@ wrangler deploy; # npm i -g wrangler
 
 Check out the demo:
 [https://cloudflare-ai-workers-chatgpt-plugin-example.cagatay.workers.dev](https://cloudflare-ai-workers-chatgpt-plugin-example.cagatay.workers.dev)
+
+> // TODO @cagataycali: Remove the .cagatay.workers.dev when merged into main.
 
 
 ```typescript
