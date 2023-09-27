@@ -1,4 +1,4 @@
-# Example ChatGPT Plugin for Cloudflare Workers
+# Example ChatGPT Plugin for Cloudflare Workers with Cloudflare AI
 
 This is an example plugin showing how to build [ChatGPT plugins](https://platform.openai.com/docs/plugins/introduction) using [Cloudflare Workers](https://workers.dev). Using this example, you can deploy a plugin to Cloudflare Workers in just a few minutes.
 
