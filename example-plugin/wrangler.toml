@@ -1,3 +1,6 @@
 name = "cloudflare-ai-workers-chatgpt-plugin-example"
 main = "src/index.ts"
 compatibility_date = "2023-04-07"
+
+[ai]
+binding = "AI" # i.e. available in your Worker on env.AI

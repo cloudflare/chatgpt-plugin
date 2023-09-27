@@ -56,13 +56,15 @@ export class GetSearch extends OpenAPIRoute {
     // generate a response with Cloudflare AI:
 
     // Run a model call
-    const output = await ai.run('@cf/meta/llama-2-7b-chat-int8', {
-      prompt: `Explain the repositories: ${JSON.stringify(repos)}`
-    })
+    const messages = [
+      { role: 'system', content: "I'm going to help you to find the best GitHub repository based on your search." },
+      { role: 'user', content: 'My search is: ' + data.q },
+    ];
+    const response = await ai.run('@cf/meta/llama-2-7b-chat-int8', { messages });
 
     return {
       repos: repos,
-      ai: output
+      ai: response
     }
   }
 }
