@@ -53,9 +53,7 @@ export class GetSearch extends OpenAPIRoute {
       stars: item.stargazers_count,
       url: item.html_url
     }))
-    // generate a response with Cloudflare AI:
-
-    // Run a model call
+    // Generate a response with Cloudflare AI:
     const messages = [
       { role: 'system', content: "I'm going to help you to find the best GitHub repository based on your search." },
       { role: 'user', content: 'My search is: ' + data.q },
