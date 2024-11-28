@@ -1,4 +1,5 @@
 import { ApiException, OpenAPIRoute, Query, ValidationError } from "@cloudflare/itty-router-openapi";
+import { Ai } from '@cloudflare/ai';
 
 export class GetSearch extends OpenAPIRoute {
   static schema = {
@@ -27,6 +28,9 @@ export class GetSearch extends OpenAPIRoute {
   }
 
   async handle(request: Request, env, ctx, data: Record<string, any>) {
+    // Initiate the AI
+    const ai = new Ai(env.AI)
+
     const url = `https://api.github.com/search/repositories?q=${data.q}`
 
     const resp = await fetch(url, {
@@ -49,9 +53,16 @@ export class GetSearch extends OpenAPIRoute {
       stars: item.stargazers_count,
       url: item.html_url
     }))
+    // Generate a response with Cloudflare AI:
+    const messages = [
+      { role: 'system', content: "I'm going to help you to find the best GitHub repository based on your search." },
+      { role: 'user', content: 'My search is: ' + data.q },
+    ];
+    const response = await ai.run('@cf/meta/llama-2-7b-chat-int8', { messages });
 
     return {
-      repos: repos
+      repos: repos,
+      ai: response
     }
   }
 }
